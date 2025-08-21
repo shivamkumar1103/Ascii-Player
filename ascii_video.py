@@ -1,17 +1,21 @@
 import os
 import cv2
 import time
+import argparse
 
 class AsciiPlayer:
 
     def __init__(self,video_path,width):
         self.video_path = video_path
         self.ascii_table = "     .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
-        self.clip = cv2.VideoCapture(self.video_path)
-
+        self.clip = cv2.VideoCapture(video_path)
         if not self.clip.isOpened():
-            print(f"Error: Couldn't open video")
-        self.new_width = width
+            raise IOError(f"Error: Couldn't open video")
+        self.width_is_dynamic = (width is None)
+        if self.width_is_dynamic:
+            self.new_width = os.get_terminal_size().columns
+        else:
+            self.new_width = width
         self.fps = self.clip.get(cv2.CAP_PROP_FPS)
         self.delay = 1/self.fps if self.fps > 0 else 0.04
 
@@ -44,30 +48,41 @@ class AsciiPlayer:
         frame_count = 0
         print(f"Playing... Press Ctrl+C to stop.")
         time.sleep(2)
-        try:
-            while True:
-                ret,frame = self.clip.read()
-                if ret:
-                    ascii_art = self.frame_to_ascii(frame)
-                    frame_count += 1
-                    os.system('cls' if os.name == 'nt' else 'clear')
-                    print(ascii_art)
-                else:
-                    break
-                time.sleep(self.delay)
-
-        except KeyboardInterrupt:
-            print("\nPlayback stopped")
-        finally:
-            print(f"Processed: {frame_count} frames")
-            self.clip.release()
+        while True:
+            ret,frame = self.clip.read()
+            if ret:
+                if self.width_is_dynamic:
+                    self.new_width = os.get_terminal_size().columns
+                ascii_art = self.frame_to_ascii(frame)
+                frame_count += 1
+                os.system('cls' if os.name == 'nt' else 'clear')
+                print(ascii_art)
+            else:
+                break
+            time.sleep(self.delay)
+        self.clip.release()
+        return frame_count
 
 
-player = AsciiPlayer(r"c:\Users\hbggy\Downloads\TheBatman.mp4",120)
-player.play()
+# command line arguments
+parser = argparse.ArgumentParser(description="Play videos as ASCII art in terminal.")
+parser.add_argument("video_path",help="The path of the video file to play.") 
+parser.add_argument("-w","--width",
+                    type=int,
+                    default=None,
+                    help="Width of the video output. Defaults to the current terminal width")
+args = parser.parse_args()
 
 
-
-
-# import argpase
-# add audio
+if __name__ == "__main__":
+    try:
+        player = AsciiPlayer(args.video_path,args.width)
+        frame_count = player.play()
+        print(f"Processed: {frame_count} frames")
+    except IOError as e:
+        print(e)
+    except KeyboardInterrupt:
+        print("\nPlayback stopped")
+    finally:
+        player.clip.release()
+    
