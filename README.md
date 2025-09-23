@@ -27,12 +27,12 @@ Installation
 
 bash
 
-pip install opencv-python
+    pip install opencv-python
 
 Usage
 bash
 
-python ascii_player.py [video_path] [options]
+    python ascii_player.py [video_path] [options]
 
 Arguments
 
