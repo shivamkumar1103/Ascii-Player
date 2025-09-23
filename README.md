@@ -47,17 +47,17 @@ Examples
 Play a video using the full terminal width:
 bash
 
-python ascii_player.py my_video.mp4
+    python ascii_player.py my_video.mp4
 
 Play a video with a specific width (80 characters):
 bash
 
-python ascii_player.py my_video.mp4 -w 80
+    python ascii_player.py my_video.mp4 -w 80
 
 Play a video with 120 characters width:
 bash
 
-python ascii_player.py my_video.mp4 --width 120
+    python ascii_player.py my_video.mp4 --width 120
 
 Controls
 
