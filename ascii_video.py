@@ -11,17 +11,26 @@ class AsciiPlayer:
     def __init__(self,video_path,width):
         self.video_path = video_path
         self.ascii_table = "     .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$"
-        self.clip = cv2.VideoCapture(video_path)
-        if not self.clip.isOpened():
-            raise IOError(f"Error: Couldn't open video")
+        self.audio_file = "extracted_audio.mp3"
+        self.set_clip(video_path)
         self.extract_audio()
         self.set_width(width)
         self.set_fps()
 
+    def set_clip(self,video_path):
+        if video_path is None:
+            self.clip = cv2.VideoCapture(0)
+        else:
+            self.clip = cv2.VideoCapture(video_path)
+        if not self.clip.isOpened():
+            raise IOError(f"Error: Couldn't open video")
+
     def extract_audio(self):
+        if self.video_path is None:
+            return
         print("Extracting audio...")
         self.video = VideoFileClip(self.video_path)
-        self.video.audio.write_audiofile("extracted_audio.mp3")
+        self.video.audio.write_audiofile(self.audio_file)
         self.video.close()
 
     def set_width(self,width):
@@ -87,7 +96,8 @@ class AsciiPlayer:
         return frame_count
    
     def audio(self):
-        playsound("extracted_audio.mp3")
+        if not self.video_path is None:
+            playsound("extracted_audio.mp3")
         
     def play_audio(self):
         audio_thread = threading.Thread(target=self.audio,daemon=True)
@@ -96,11 +106,12 @@ class AsciiPlayer:
     def release(self):
         if self.clip:
             self.clip.release()
-        os.remove("extracted_audio.mp3")
+        if os.path.exists(self.audio_file):
+                    os.remove(self.audio_file)
 
 # command line arguments
 parser = argparse.ArgumentParser(description="Play videos as ASCII art in terminal.")
-parser.add_argument("video_path",help="The path of the video file to play.") 
+parser.add_argument("-v","--video_path",default=None,help="The path of the video file to play.") 
 parser.add_argument("-w","--width",
                     type=int,
                     default=None,
