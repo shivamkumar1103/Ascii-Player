@@ -19,6 +19,10 @@ Requirements
 
     OpenCV (cv2) library
 
+    MoviePy
+
+    Playsound
+
 Installation
 
     Install Python 3.x from python.org
@@ -27,12 +31,17 @@ Installation
 
 bash
 
-    pip install opencv-python
+    pip install opencv-python moviepy playsound
+
+    # If you encounter issues with playsound, try:
+    pip install --upgrade wheel
+    pip install --upgrade setuptools wheel
+    pip install playsound
 
 Usage
 bash
 
-    python ascii_player.py [video_path] [options]
+    python ascii_player.py [OPTIONS]
 
 Arguments
 
@@ -47,18 +56,23 @@ Examples
 Play a video using the full terminal width:
 bash
 
-    python ascii_player.py my_video.mp4
+    python ascii_player.py -v my_video.mp4
 
 Play a video with a specific width (80 characters):
 bash
 
-    python ascii_player.py my_video.mp4 -w 80
+    python ascii_player.py -v my_video.mp4 -w 80
 
-Play a video with 120 characters width:
+Use webcam as video source:
 bash
 
-    python ascii_player.py my_video.mp4 --width 120
+    python ascii_player.py
 
+Play webcam feed with custom width:
+bash
+
+    python ascii_player.py -w 100
+    
 Controls
 
     Press Ctrl+C during playback to stop the video
